@@ -1,47 +1,25 @@
 require('./config/config');
 const express = require('express');
-const app = express();
 const bodyParser = require('body-parser');
 
+const app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-app.get('/', function(req, res) {
-    res.json('Evento get')
+app.use(require('./routes/usuario.js'));
 
-})
+const mongoose = require('mongoose');
 
-app.post('/', function(req, res) {
-    let body = req.body;
-    if (body.nom === undefined) {
-        res.status(400).json({
-            ok: false,
-            messaje: 'El nom es obligatori'
-        })
-    } else {
-        res.json({
-            persona: body
-        });
-    }
+//mongoose.connect('mongodb://localhost:27017/cafe', { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
+    (err, res) => {
+        if (err) throw err;
+        console.log('Database Cafe Working ' + process.env.URLDB);
+    });
 
-})
-
-app.put('/usuario/:id', function(req, res) {
-    let id = req.params.id;
-    res.json({
-        id: id
-    })
-
-
-})
-
-app.delete('/', function(req, res) {
-    res.json('Evento delete')
-
-})
 
 app.listen(process.env.PORT, () => {
     console.log(`Server runnig on port ${process.env.PORT} v1`);
