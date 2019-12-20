@@ -4,7 +4,11 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 
-app.get('/usuario', function(req, res) {
+const { verificaToken, verificaRole } = require('../middlewares/autenticacion');
+
+
+app.get('/usuario', verificaToken, (req, res) => {
+
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -40,10 +44,10 @@ app.get('/usuario', function(req, res) {
 
 })
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaRole], (req, res) => {
     let body = req.body;
     let salt = bcrypt.genSaltSync(10);
-    var hash = bcrypt.hashSync(body.password, salt);
+    let hash = bcrypt.hashSync(body.password, salt);
 
     let usuario = new Usuario({
         nom: body.nom,
@@ -68,7 +72,7 @@ app.post('/usuario', function(req, res) {
 
 })
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificaToken, verificaRole], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nom', 'email', 'img', 'role', 'estat']);
     //let body = req.body;
@@ -94,7 +98,7 @@ app.put('/usuario/:id', function(req, res) {
 
 })
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaRole], (req, res) => {
     let id = req.params.id;
 
     Usuario.findByIdAndUpdate(id, { estat: false }, { new: true }, (err, usuarioBorrado) => {

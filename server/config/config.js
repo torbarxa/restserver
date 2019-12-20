@@ -4,6 +4,12 @@ process.env.PORT = process.env.PORT || 3000;
 // Entorn
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
+// Exprires 30 days
+process.env.EXPIRES_TOKEN = 60 * 60 * 24 * 30;
+
+// Seed desarrollo
+process.env.SEED = process.env.SEED || 'seed desarrollo';
+
 // Base de dades
 let urlDB;
 if (process.env.NODE_ENV === 'dev') {
