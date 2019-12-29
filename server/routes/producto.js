@@ -83,6 +83,39 @@ app.get('/productos/:id', verificaToken, (req, resp) => {
 
 });
 
+// buscar productos
+app.get('/productos/buscar/:termino', verificaToken, (req, resp) => {
+
+    let termino = req.params.termino;
+    let regex = new RegExp(termino, 'i');
+
+    Producto.find({ nombre: regex })
+        .populate('categoria', 'descripcio')
+        .exec((err, productos) => {
+
+            if (err) {
+                return resp.status(500).json({
+                    ok: false,
+                    err: err
+                });
+            }
+
+            resp.json({
+                ok: true,
+                productos: productos,
+
+            })
+
+
+
+
+        });
+
+
+});
+
+
+
 // Crear un producte
 app.post('/productos', verificaToken, (req, resp) => {
     //Grabar producte amb categoria i usuari
@@ -151,6 +184,28 @@ app.put('/productos/:id', verificaToken, (req, resp) => {
 
 app.delete('/productos/:id', verificaToken, (req, resp) => {
     //Borra producte, canvia disponible a falç
+    Producto.findByIdAndUpdate(req.params.id, { disponible: false }, { new: true }, (err, productoDB) => {
+        if (err) {
+            return resp.status(400).json({
+                ok: false,
+                err: err
+            });
+        }
+
+        if (!productoDB) {
+            return resp.status(400).json({
+                ok: false,
+                messaje: 'product not found'
+            });
+        }
+
+        resp.json({
+            ok: true,
+            producto: productoDB,
+            messaje: 'Producto borrado crrectamente'
+
+        })
+    })
 
 
 });
