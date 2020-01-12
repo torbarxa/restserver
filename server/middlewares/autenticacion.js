@@ -34,6 +34,23 @@ let verificaToken = (req, res, next) => {
 
 };
 
+let verificaTokenURL = (req, res, next) => {
+    let token = req.query.token;
+    jwt.verify(token, process.env.SEED, (err, decode) => {
+        if (err) {
+            res.status(401).json({
+                ok: false,
+                err,
+                message: 'token invalid'
+            })
+        } else {
+            req.usuario = decode.usuario;
+            console.log('Token OK!');
+            next();
+        }
+
+    })
+}
 
 // Middleware para verificar el role de administración
 let verificaRole = (req, res, next) => {
@@ -55,5 +72,6 @@ let verificaRole = (req, res, next) => {
 
 module.exports = {
     verificaToken,
-    verificaRole
+    verificaRole,
+    verificaTokenURL
 }
