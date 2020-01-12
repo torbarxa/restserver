@@ -64,9 +64,9 @@ app.put('/upload/:tipo/:id', verificaToken, (req, resp) => {
         switch (tipo) {
             case 'usuarios':
                 imagenUsuario(id, resp, newName);
-
                 break;
             case 'productos':
+                imagenProducto(id, resp, newName);
                 break;
             default:
                 break;
@@ -76,6 +76,43 @@ app.put('/upload/:tipo/:id', verificaToken, (req, resp) => {
     });
 
 });
+
+
+function imagenProducto(id, resp, newName) {
+    Producto.findById(id, (err, productoDB) => {
+        if (err) {
+            borrarArchivo(newName, 'productos');
+            return resp.status(400).json({
+                ok: false,
+                err: err
+            })
+        } else {
+
+            if (!productoDB) {
+                borrarArchivo(newName, 'productos');
+                return resp.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'Product not exists'
+                    }
+                })
+            }
+
+            borrarArchivo(productoDB.img, 'productos');
+
+
+            productoDB.img = newName;
+            productoDB.save((err, productoDB) => {
+                resp.json({
+                    ok: true,
+                    producto: productoDB,
+                    img: newName
+                });
+            })
+        }
+
+    })
+}
 
 function imagenUsuario(id, resp, newName) {
 
